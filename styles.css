@@ -1,3 +1,25 @@
-/* selectors need two classes (`.bullet-quote .foo`) to beat obsidian's base
-   `button` and `input` rules; theme variables (--text-muted, --color-red,
-   --size-4-3, --radius-m) keep it themeable. */
+/* live preview: the bar is a border on the inline quote text rather than on
+   the line, so `box-decoration-break: clone` repeats it on every wrapped
+   fragment at the content column, where the wrap itself lands. the vertical
+   padding paints outside the line box so consecutive quote lines join up. */
+.markdown-source-view.mod-cm6.is-live-preview .cm-line .bullet-quote-text {
+	-webkit-box-decoration-break: clone;
+	box-decoration-break: clone;
+	border-inline-start: var(--blockquote-border-thickness) solid var(--blockquote-border-color);
+	padding-inline-start: var(--size-4-3);
+	padding-block: 0.2em;
+	color: var(--blockquote-color);
+	font-style: var(--blockquote-font-style);
+	background-color: var(--blockquote-background-color);
+}
+
+.markdown-source-view.mod-cm6.is-live-preview .cm-line .bullet-quote-marker {
+	color: var(--text-faint);
+}
+
+/* reading view: obsidian gives blockquotes a top and bottom margin that
+   opens a gap inside a tight list item */
+.markdown-preview-view li > blockquote,
+.markdown-preview-view li > p > blockquote {
+	margin-block: 0;
+}
