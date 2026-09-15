@@ -36,18 +36,18 @@
 	display: none;
 }
 
-/* a quote line that follows another quote line: obsidian parses it as a
-   plain quote continuation and leaves its leading whitespace unpadded, so
-   the `>` lands near the margin. give that whitespace the same list content
-   column obsidian's `.HyperMD-list-line-nobullet` rule gives the first
-   quote line after a list item. */
-.markdown-source-view.mod-cm6.is-live-preview .bullet-quote-cont:not(.HyperMD-list-line) {
+/* a continuation line's stand-in for its item's marker: same classes as the
+   real one so it takes the same width, just not painted. a plain quote line
+   has no list tab-size of its own, so give it the list one for the indent. */
+.markdown-source-view.mod-cm6.is-live-preview .bullet-quote-cont {
 	tab-size: var(--list-indent);
 }
 
-.markdown-source-view.mod-cm6.is-live-preview
-	.bullet-quote-cont:not(.HyperMD-list-line)
-	> .cm-hmd-indent-in-quote
-	> .cm-indent-spacing:last-child {
-	padding-inline-start: calc(var(--list-indent-editing) + var(--list-marker-space));
+.markdown-source-view.mod-cm6.is-live-preview .bullet-quote-fake {
+	visibility: hidden;
+	white-space: pre;
+}
+
+.markdown-source-view.mod-cm6.is-live-preview .bullet-quote-fake .cm-indent {
+	min-width: 0;
 }
