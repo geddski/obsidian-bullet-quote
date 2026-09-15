@@ -1,24 +1,35 @@
-/* the bar is a border on the inline quote text rather than on the line, so
-   `box-decoration-break: clone` repeats it on every wrapped fragment at the
-   content column, where the wrap itself lands. the vertical padding paints
-   outside the line box so consecutive quote lines join up. */
+/* the quote text is an inline mark starting at the list item's content column.
+   the bar is an absolutely positioned pseudo element on it, so it takes its x
+   from the mark's start and its height from the line, as obsidian's own quote
+   bar does; `box-decoration-break: clone` indents every wrapped fragment past
+   it. */
 .markdown-source-view.mod-cm6.is-live-preview .cm-line .bullet-quote-text {
 	-webkit-box-decoration-break: clone;
 	box-decoration-break: clone;
-	border-inline-start: var(--blockquote-border-thickness) solid var(--blockquote-border-color);
-	padding-inline-start: var(--size-4-3);
-	padding-block: 0.35em;
+	padding-inline-start: calc(var(--size-4-3) + var(--blockquote-border-thickness));
 	color: var(--blockquote-color);
 	font-style: var(--blockquote-font-style);
 	background-color: var(--blockquote-background-color);
+}
+
+.markdown-source-view.mod-cm6.is-live-preview .cm-line .bullet-quote-text::before {
+	content: '\200b';
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 0;
+	/* the static position is past the mark's padding; pull back to its edge */
+	margin-inline-start: calc(-1 * (var(--size-4-3) + var(--blockquote-border-thickness)));
+	border-inline-start: var(--blockquote-border-thickness) solid var(--blockquote-border-color);
+	pointer-events: none;
 }
 
 .markdown-source-view.mod-cm6.is-live-preview .cm-line .bullet-quote-marker {
 	color: var(--text-faint);
 }
 
-/* a quote line inside a list item: drop obsidian's margin bar, the inline
-   one above takes over under the bullet */
+/* a quote line inside a list item: drop obsidian's margin bar, the one above
+   takes over under the bullet */
 .markdown-source-view.mod-cm6.is-live-preview .HyperMD-quote.bullet-quote-cont::before {
 	display: none;
 }
