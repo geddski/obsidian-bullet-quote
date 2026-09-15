@@ -1,0 +1,3 @@
+/* selectors need two classes (`.bullet-quote .foo`) to beat obsidian's base
+   `button` and `input` rules; theme variables (--text-muted, --color-red,
+   --size-4-3, --radius-m) keep it themeable. */
