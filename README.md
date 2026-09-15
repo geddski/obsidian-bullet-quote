@@ -1,6 +1,8 @@
 # Bullet Quote
 
-Quotes inside bullets for [Obsidian](https://obsidian.md). Live Preview finally renders `- > quote` the way Reading view already does: a quote bar under the bullet, on every line of the quote.
+[Obsidian](https://obsidian.md) is amazing, but one thing that has driven me crazy for years is that it doesn't properly render quotes that are inside of bullet items. This plugin fixes that!
+
+Live Preview finally renders `- > quote` the way Reading view already does: a quote bar under the bullet, on every line of the quote.
 
 <p align="center">
   <img src="docs/bullet-quote.png" width="600" alt="A list in Live Preview where quotes inside bullets, numbered items, tasks and nested bullets each show a quote bar under their marker">
