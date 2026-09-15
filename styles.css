@@ -1,8 +1,17 @@
-/* the quote text is an inline mark starting at the list item's content column.
-   the bar is an absolutely positioned pseudo element on it, so it takes its x
-   from the mark's start and its height from the line, as obsidian's own quote
-   bar does; `box-decoration-break: clone` indents every wrapped fragment past
-   it. */
+/* the bar is a zero-width widget where the `> ` marker sits, at the list
+   item's content column; the pseudo element takes its x from there and its
+   height from the line, as obsidian's own quote bar does */
+.markdown-source-view.mod-cm6.is-live-preview .cm-line .bullet-quote-bar::before {
+	content: '\200b';
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 0;
+	border-inline-start: var(--blockquote-border-thickness) solid var(--blockquote-border-color);
+	pointer-events: none;
+}
+
+/* `box-decoration-break: clone` indents every wrapped fragment past the bar */
 .markdown-source-view.mod-cm6.is-live-preview .cm-line .bullet-quote-text {
 	-webkit-box-decoration-break: clone;
 	box-decoration-break: clone;
@@ -12,24 +21,33 @@
 	background-color: var(--blockquote-background-color);
 }
 
-.markdown-source-view.mod-cm6.is-live-preview .cm-line .bullet-quote-text::before {
-	content: '\200b';
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	width: 0;
-	/* the static position is past the mark's padding; pull back to its edge */
-	margin-inline-start: calc(-1 * (var(--size-4-3) + var(--blockquote-border-thickness)));
-	border-inline-start: var(--blockquote-border-thickness) solid var(--blockquote-border-color);
-	pointer-events: none;
+/* active line: the visible `> ` supplies the gap */
+.markdown-source-view.mod-cm6.is-live-preview .cm-line .bullet-quote-active {
+	padding-inline-start: 0;
 }
 
 .markdown-source-view.mod-cm6.is-live-preview .cm-line .bullet-quote-marker {
 	color: var(--text-faint);
 }
 
-/* a quote line inside a list item: drop obsidian's margin bar, the one above
-   takes over under the bullet */
+/* a quote line inside a list item: drop obsidian's margin bar, the widget
+   above takes over under the bullet */
 .markdown-source-view.mod-cm6.is-live-preview .HyperMD-quote.bullet-quote-cont::before {
 	display: none;
+}
+
+/* a quote line that follows another quote line: obsidian parses it as a
+   plain quote continuation and leaves its leading whitespace unpadded, so
+   the `>` lands near the margin. give that whitespace the same list content
+   column obsidian's `.HyperMD-list-line-nobullet` rule gives the first
+   quote line after a list item. */
+.markdown-source-view.mod-cm6.is-live-preview .bullet-quote-cont:not(.HyperMD-list-line) {
+	tab-size: var(--list-indent);
+}
+
+.markdown-source-view.mod-cm6.is-live-preview
+	.bullet-quote-cont:not(.HyperMD-list-line)
+	> .cm-hmd-indent-in-quote
+	> .cm-indent-spacing:last-child {
+	padding-inline-start: calc(var(--list-indent-editing) + var(--list-marker-space));
 }

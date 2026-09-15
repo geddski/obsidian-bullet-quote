@@ -1,7 +1,7 @@
 import { syntaxTree } from '@codemirror/language';
-import { RangeSetBuilder } from '@codemirror/state';
-import { Decoration, ViewPlugin } from '@codemirror/view';
+import { Decoration, ViewPlugin, WidgetType } from '@codemirror/view';
 import type { DecorationSet, EditorView, ViewUpdate } from '@codemirror/view';
+import type { Range } from '@codemirror/state';
 import { editorLivePreviewField } from 'obsidian';
 
 // a list marker (bullet, number, or task box) whose content opens with a quote
@@ -15,16 +15,35 @@ const QUOTE_CONT = /^(\s+)(>)(\s?)/;
 // token names obsidian's stream parser gives text that only looks like markdown
 const NOT_MARKDOWN = /codeblock|comment|math|frontmatter/;
 
-const hiddenMarker = Decoration.replace({});
+// zero-width anchor for the bar; the css draws it at line height from here
+class BarWidget extends WidgetType {
+	toDOM() {
+		return createSpan({ cls: 'bullet-quote-bar' });
+	}
+	eq() {
+		return true;
+	}
+	ignoreEvent() {
+		return true;
+	}
+}
+const bar = new BarWidget();
+
+const barInsteadOfMarker = Decoration.replace({ widget: bar });
+const barBeforeMarker = Decoration.widget({ widget: bar, side: -1 });
 const shownMarker = Decoration.mark({ class: 'cm-formatting cm-formatting-quote bullet-quote-marker' });
 const quoteText = Decoration.mark({ class: 'cm-quote bullet-quote-text' });
+// on the active line the visible `> ` supplies the gap after the bar, so the
+// text carries no padding there; otherwise the cursor at the text's start
+// would sit a padding's width left of the first character
+const activeQuoteText = Decoration.mark({ class: 'cm-quote bullet-quote-text bullet-quote-active' });
 const inListQuoteLine = Decoration.line({ class: 'bullet-quote-cont' });
 
 function buildDecorations(view: EditorView): DecorationSet {
-	const builder = new RangeSetBuilder<Decoration>();
 	if (!view.state.field(editorLivePreviewField)) {
-		return builder.finish();
+		return Decoration.none;
 	}
+	const ranges: Range<Decoration>[] = [];
 	const { doc, selection } = view.state;
 	const tree = syntaxTree(view.state);
 	for (const { from, to } of view.visibleRanges) {
@@ -55,19 +74,21 @@ function buildDecorations(view: EditorView): DecorationSet {
 				if (!/formatting-quote/.test(token) || !/list-\d/.test(token)) {
 					continue;
 				}
-				builder.add(line.from, line.from, inListQuoteLine);
+				ranges.push(inListQuoteLine.range(line.from));
 			}
-			// the marker is hidden by removing it from layout, not by making it
-			// transparent as obsidian does for its own quotes: a transparent `> `
-			// would push the first line's text past the wrapped lines
 			const isActive = selection.ranges.some((r) => r.from <= line.to && r.to >= line.from);
-			builder.add(markerFrom, textFrom, isActive ? shownMarker : hiddenMarker);
+			if (isActive) {
+				ranges.push(barBeforeMarker.range(markerFrom));
+				ranges.push(shownMarker.range(markerFrom, textFrom));
+			} else {
+				ranges.push(barInsteadOfMarker.range(markerFrom, textFrom));
+			}
 			if (textFrom < line.to) {
-				builder.add(textFrom, line.to, quoteText);
+				ranges.push((isActive ? activeQuoteText : quoteText).range(textFrom, line.to));
 			}
 		}
 	}
-	return builder.finish();
+	return Decoration.set(ranges, true);
 }
 
 export const bulletQuoteExtension = ViewPlugin.fromClass(
@@ -81,7 +102,10 @@ export const bulletQuoteExtension = ViewPlugin.fromClass(
 		update(update: ViewUpdate) {
 			const modeChanged =
 				update.state.field(editorLivePreviewField) !== update.startState.field(editorLivePreviewField);
-			if (update.docChanged || update.viewportChanged || update.selectionSet || modeChanged) {
+			// the parser can finish after the edit that triggered it, in a
+			// transaction with no other change
+			const treeChanged = syntaxTree(update.state) !== syntaxTree(update.startState);
+			if (update.docChanged || update.viewportChanged || update.selectionSet || modeChanged || treeChanged) {
 				this.decorations = buildDecorations(update.view);
 			}
 		}
