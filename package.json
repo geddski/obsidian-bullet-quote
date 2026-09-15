@@ -1,7 +1,7 @@
 {
 	"name": "bullet-quote",
 	"version": "0.1.0",
-	"description": "Render blockquotes inside list items in Live Preview and Reading view",
+	"description": "Render a blockquote inside a list item in Live Preview",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {

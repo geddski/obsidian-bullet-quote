@@ -3,7 +3,7 @@
 	"name": "Bullet Quote",
 	"version": "0.1.0",
 	"minAppVersion": "1.13.0",
-	"description": "Render blockquotes inside list items in Live Preview and Reading view",
+	"description": "Render a blockquote inside a list item in Live Preview",
 	"author": "geddski",
 	"authorUrl": "https://github.com/geddski",
 	"isDesktopOnly": false
