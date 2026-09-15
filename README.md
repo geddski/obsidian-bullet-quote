@@ -1,22 +1,29 @@
 # Bullet Quote
 
-Renders a blockquote inside a list item in Live Preview, the way Reading view already does.
+Quotes inside bullets for [Obsidian](https://obsidian.md). Live Preview finally renders `- > quote` the way Reading view already does: a quote bar under the bullet, on every line of the quote.
 
-<!-- screenshot: docs/<id>.png, captured from the vault in dark theme -->
+<p align="center">
+  <img src="docs/bullet-quote.png" width="600" alt="A list in Live Preview where quotes inside bullets, numbered items, tasks and nested bullets each show a quote bar under their marker">
+</p>
 
 ## Usage
 
 Write a quote inside a bullet, numbered item, or task:
 
 ```md
-- > quote yo
+- > this is a quote in a bullet, finally!
 - item
-  > a quote under the item
-- > several
-  > lines
+  > quotes under items
+  > work great too
+- > multi
+  > line quote
+1. > numbered quotes
+- [ ] > quotes in tasks
 ```
 
-In Live Preview the quote bar sits under the bullet on every line, and the `>` reappears while the cursor is on that line. Obsidian's own parser only handles the indented form, and puts its bar at the margin; this plugin covers the `- > ` form and moves the bar under the bullet for both.
+The `>` reappears while the cursor is on its line, so editing works as before. Reading view is untouched; Obsidian already parses these correctly there.
+
+Why a plugin: Obsidian's Live Preview uses a line-based tokenizer that only opens a quote when `>` starts the line. CommonMark allows a quote to open right after a list marker, and Obsidian's Reading view honours that, so this only patches the editor.
 
 ## Install
 
